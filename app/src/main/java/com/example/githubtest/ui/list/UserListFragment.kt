@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.ConcatAdapter
 import com.example.githubtest.R
 import com.example.githubtest.databinding.FragmentUserDetailBinding
 import com.example.githubtest.databinding.FragmentUserListBinding
@@ -21,7 +22,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class UserListFragment : Fragment() {
+class UserListFragment : Fragment(), ListOnClickListener {
 
     private var _binding: FragmentUserListBinding? = null
     private val binding: FragmentUserListBinding get() = _binding!!
@@ -41,21 +42,19 @@ class UserListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = UserListAdapter(object : ListOnClickListener {
-            override fun onClickItem(id: Int) {
-                findNavController().navigate(UserListFragmentDirections.actionUserListFragmentToDetailFragment(id))
-            }
+        val adapter = UserListAdapter(this)
 
-            override fun onClickFavorite(id: Int, isFavorite: Boolean) {
-                lifecycleScope.launch {
-                    viewModel.updateFavorite(id, !isFavorite)
-                }
+        val favoriteListAdapter = UserFavoriteListAdapter(this)
+        lifecycleScope.launchWhenCreated {
+            viewModel.favoriteItems.collectLatest {
+                favoriteListAdapter.submitList(it)
             }
-        })
+        }
 
-        binding.rvUserList.adapter = adapter.withLoadStateFooter(
+        val concatAdapter = ConcatAdapter(favoriteListAdapter, adapter.withLoadStateFooter(
             footer = UserListLoadStateAdapter(adapter)
-        )
+        ))
+        binding.rvUserList.adapter = concatAdapter
 
         lifecycleScope.launchWhenCreated {
             viewModel.pagedList.collectLatest {
@@ -71,6 +70,16 @@ class UserListFragment : Fragment() {
                 // Only react to cases where Remote REFRESH completes i.e., NotLoading.
                 .filter { it.refresh is LoadState.NotLoading }
                 .collect { binding.rvUserList.scrollToPosition(0) }
+        }
+    }
+
+    override fun onClickItem(id: Int) {
+        findNavController().navigate(UserListFragmentDirections.actionUserListFragmentToDetailFragment(id))
+    }
+
+    override fun onClickFavorite(id: Int, isFavorite: Boolean) {
+        lifecycleScope.launch {
+            viewModel.updateFavorite(id, !isFavorite)
         }
     }
 

@@ -40,4 +40,8 @@ class SearchUserRepository @Inject constructor(
             dao.updateFavorite(id, isFavorite)
         }
     }
+
+    fun getFavoriteItems(): Flow<List<SearchUser>> {
+        return dao.getFavoriteItems()
+    }
 }

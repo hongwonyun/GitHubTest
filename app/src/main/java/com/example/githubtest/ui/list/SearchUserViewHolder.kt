@@ -9,9 +9,11 @@ class SearchUserViewHolder(
     private val binding: ItemUserBinding
 ): RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: SearchUser, listener: ListOnClickListener) {
+    fun bind(item: SearchUser, position: Int, isFavorite: Boolean, listener: ListOnClickListener) {
         Log.d("TEST", "item : $item")
         binding.item = item
+        binding.position = position
+        binding.isFavorite = isFavorite
         binding.root.setOnClickListener {
             item.id?.let {
                 listener.onClickItem(it)

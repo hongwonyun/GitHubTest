@@ -29,4 +29,6 @@ class UserListViewModel @Inject constructor(
     fun updateFavorite(id: Int, isFavorite: Boolean) {
         repository.updateFavorite(id, isFavorite)
     }
+
+    val favoriteItems: Flow<List<SearchUser>> = repository.getFavoriteItems()
 }

@@ -4,12 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.example.githubtest.databinding.ItemUserBinding
 import com.example.githubtest.domain.model.SearchUser
 
-class UserListAdapter(
+class UserFavoriteListAdapter(
     private val listener: ListOnClickListener
-): PagingDataAdapter<SearchUser, SearchUserViewHolder>(COMPARATOR) {
+): ListAdapter<SearchUser, SearchUserViewHolder>(COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchUserViewHolder {
         return SearchUserViewHolder(ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -17,7 +18,7 @@ class UserListAdapter(
 
     override fun onBindViewHolder(holder: SearchUserViewHolder, position: Int) {
         getItem(position)?.let { item ->
-            holder.bind(item, position, false, listener)
+            holder.bind(item, position, true, listener)
         }
     }
 
