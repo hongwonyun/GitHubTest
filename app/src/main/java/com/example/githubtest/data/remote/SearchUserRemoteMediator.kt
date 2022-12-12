@@ -40,7 +40,8 @@ class SearchUserRemoteMediator @Inject constructor(
                 LoadType.REFRESH -> 1
                 LoadType.PREPEND -> null
                 LoadType.APPEND -> {
-                    page.plus(1)
+                    page = page.plus(1)
+                    page
                 }
             } ?: return MediatorResult.Success(endOfPaginationReached = true)
             Log.d("TEST", "loadKey $loadKey")
